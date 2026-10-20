@@ -1,0 +1,151 @@
+# Capa de dominio
+
+Esta capa contiene los modelos, contratos, enumeraciones e interfaces que
+representan las reglas y estructuras principales de la aplicación. El resto de
+las capas debe consumir estos elementos a través del índice
+[`Domain/index.ts`](./index.ts), que funciona como punto único de exportación.
+
+## Estructura
+
+```text
+Domain/
+├── classes/
+│   ├── models/
+│   │   ├── User.model.ts
+│   │   ├── Laboratory.model.ts
+│   │   ├── Computer.model.ts
+│   │   ├── Reservation.model.ts
+│   │   └── Comment.model.ts
+│   └── generics/
+│       ├── Contract.ts
+│       └── ChangeControl.ts
+├── enums/
+│   ├── Roles.enum.ts
+│   ├── Status.enum.ts
+│   ├── RespOp.enum.ts
+│   └── TypeMessage.enum.ts
+├── interfaces/
+│   └── IBase.ts
+└── index.ts
+```
+
+## Modelos y relaciones
+
+Los modelos representan objetos que pueden ser utilizados por las capas de
+negocio, persistencia y presentación. Todos implementan
+[`IBase`](./interfaces/IBase.ts), por lo que comparten:
+
+- `id`: identificador numérico del objeto.
+- `changeControl`: información de auditoría y estado lógico.
+
+Las relaciones entre los modelos son las siguientes:
+
+```text
+Laboratory 1 ──── * Computer
+User        1 ──── * Reservation
+Computer    1 ──── * Reservation
+User        1 ──── * Comment
+Computer    1 ──── * Comment
+```
+
+Estas relaciones se expresan mediante propiedades opcionales en los modelos:
+
+- [`Laboratory`](./classes/models/Laboratory.model.ts) puede estar asociado a
+  varios objetos [`Computer`](./classes/models/Computer.model.ts) mediante la
+  propiedad `laboratory`.
+- [`Reservation`](./classes/models/Reservation.model.ts) relaciona un
+  [`User`](./classes/models/User.model.ts) con un `Computer`. También conserva
+  el período (`start_time` y `end_time`) y su `Status`.
+- [`Comment`](./classes/models/Comment.model.ts) puede pertenecer a un `User` y
+  a un `Computer`. Su contenido se guarda en `message` y su clasificación en
+  `TypeMessage`.
+- [`User`](./classes/models/User.model.ts) define los datos del usuario y su
+  nivel de acceso mediante `UserRole`.
+- [`Computer`](./classes/models/Computer.model.ts) identifica un equipo por
+  medio de `code` y permite conocer el laboratorio al que pertenece.
+
+Las propiedades de navegación son opcionales porque un objeto puede crearse o
+transportarse sin cargar todas sus relaciones. La capa que construye el objeto
+es responsable de asignarlas cuando estén disponibles.
+
+## Utilidades compartidas
+
+### `ChangeControl`
+
+[`ChangeControl`](./classes/generics/ChangeControl.ts) centraliza los datos de
+auditoría para todos los modelos:
+
+- `created_date` y `created_user`: origen del registro.
+- `modified_date` y `modified_user`: última modificación.
+- `active`: indica si el registro está activo.
+- `eliminated`: permite manejar una eliminación lógica.
+
+Cada modelo crea una instancia de `ChangeControl` en su constructor, de modo
+que los objetos nuevos siempre tienen valores iniciales de control.
+
+### `Contract<T>`
+
+[`Contract<T>`](./classes/generics/Contract.ts) es un contenedor genérico para
+respuestas entre capas. El tipo `T` permite reutilizarlo con cualquier modelo.
+Puede transportar:
+
+- `Object`: un resultado individual.
+- `ObjectList`: una colección de resultados.
+- `ObjectId`: el identificador de un objeto afectado.
+- `Response`: un mensaje descriptivo.
+- `Total`: el total de elementos disponibles.
+- `Error`: información de error.
+- `RespOp`: el resultado de la operación (`Ok`, `Error`, `Warning`,
+  `Info`, `NotFound`, `NotAuthorized` o `Validate`).
+
+Ejemplo:
+
+```ts
+const response = new Contract<User>();
+response.Object = user;
+response.RespOp = RespOp.Ok;
+response.Response = 'Usuario consultado correctamente';
+```
+
+## Enumeraciones
+
+- [`UserRole`](./enums/Roles.enum.ts): define los roles `Student`,
+  `Professor` y `Admin`.
+- [`Status`](./enums/Status.enum.ts): representa los estados disponibles de
+  una reserva, como `Available`, `Reserved`, `Completed` o `Cancelled`.
+- [`RespOp`](./enums/RespOp.enum.ts): comunica el resultado de una operación
+  entre capas.
+- [`TypeMessage`](./enums/TypeMessage.enum.ts): clasifica los comentarios como
+  `General` o `Issue`.
+
+## Constructores y creación de objetos
+
+Los modelos aceptan un objeto parcial como argumento del constructor. Esto
+permite crear instancias con únicamente los valores conocidos:
+
+```ts
+const reservation = new Reservation({
+  start_time: '2026-10-20T08:00:00.000Z',
+  end_time: '2026-10-20T10:00:00.000Z',
+  user,
+  computer,
+  status: Status.Reserved,
+});
+```
+
+Los valores que no se proporcionan conservan sus valores predeterminados. Las
+relaciones pueden asignarse después de crear la instancia si se cargan desde
+otra capa.
+
+## Importaciones
+
+Para evitar rutas internas repetidas, las clases de la capa importan los
+elementos compartidos desde `Domain/index.ts`. Las demás capas también deben
+usar el barrel:
+
+```ts
+import { Contract, Reservation, RespOp, Status } from './Domain';
+```
+
+Al agregar una clase, enumeración o interfaz pública, debe exportarse desde
+[`index.ts`](./index.ts) para que esté disponible de forma uniforme.
