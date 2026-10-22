@@ -8,6 +8,7 @@ export * from './classes/models/Comment.model';
 //      generics
 export * from './classes/generics/Contract';
 export * from './classes/generics/ChangeControl';
+export * from './classes/generics/Structures';
 // Enums
 export * from './enums/Roles.enum';
 export * from './enums/Status.enum';
