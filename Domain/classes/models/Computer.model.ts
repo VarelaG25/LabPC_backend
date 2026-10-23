@@ -10,6 +10,6 @@ export class Computer implements IBase {
 
   constructor(value: Partial<Computer> = {}) {
     this.changeControl = new ChangeControl();
-    Object.assign(value, this);
+    Object.assign(this, value);
   }
 }

@@ -11,6 +11,6 @@ export class Comment implements IBase {
 
   constructor(value: Partial<Comment> = {}) {
     this.changeControl = new ChangeControl();
-    Object.assign(value, this);
+    Object.assign(this, value);
   }
 }

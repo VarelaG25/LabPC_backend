@@ -12,6 +12,6 @@ export class Reservation implements IBase {
 
   constructor(value: Partial<Reservation> = {}) {
     this.changeControl = new ChangeControl();
-    Object.assign(value, this);
+    Object.assign(this, value);
   }
 }

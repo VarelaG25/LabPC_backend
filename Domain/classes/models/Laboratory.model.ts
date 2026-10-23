@@ -7,6 +7,6 @@ export class Laboratory implements IBase {
 
   constructor(values: Partial<Laboratory> = {}) {
     this.changeControl = new ChangeControl();
-    Object.assign(values, this);
+    Object.assign(this, values);
   }
 }
