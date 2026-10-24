@@ -1,8 +1,10 @@
-import { ChangeControl, IBase, Laboratory } from '../../index';
+import { ChangeControl, ComputerStatus, IBase, Laboratory } from '../../index';
 
 export class Computer implements IBase {
   id: number = 0;
   code: string | null = null;
+  specs: string | null = null;
+  status: ComputerStatus = ComputerStatus.Available;
 
   changeControl: ChangeControl;
 
@@ -10,6 +12,6 @@ export class Computer implements IBase {
 
   constructor(value: Partial<Computer> = {}) {
     this.changeControl = new ChangeControl();
-    Object.assign(value, this);
+    Object.assign(this, value);
   }
 }
