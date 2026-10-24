@@ -1,8 +1,10 @@
-import { ChangeControl, IBase, Laboratory } from '../../index';
+import { ChangeControl, ComputerStatus, IBase, Laboratory } from '../../index';
 
 export class Computer implements IBase {
   id: number = 0;
   code: string | null = null;
+  specs: string | null = null;
+  status: ComputerStatus = ComputerStatus.Available;
 
   changeControl: ChangeControl;
 

@@ -1,9 +1,10 @@
-import { ChangeControl, Computer, IBase, TypeMessage, User } from '../../index';
+import { ChangeControl, Computer, IBase, IncidentStatus, TypeMessage, User } from '../../index';
 
 export class Comment implements IBase {
   id: number = 0;
   message: string | null = null;
   type?: TypeMessage;
+  status?: IncidentStatus;
 
   user?: User;
   computer?: Computer;
