@@ -1,9 +1,9 @@
 import type { IUserRepository } from '../../Application';
 import { User } from '../../Domain';
-import type { MongoContext } from '../context/MongoContext';
+import type { IDataContext } from '../context/IDataContext';
 
 export class UserRepository implements IUserRepository {
-  constructor(private readonly context: MongoContext<User>) {}
+  constructor(private readonly context: IDataContext<User>) {}
 
   async findById(id: number): Promise<User | null> {
     return this.context.findOne({ id });

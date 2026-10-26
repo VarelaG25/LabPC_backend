@@ -1,10 +1,8 @@
-export type Query<T> = Partial<T>;
+import type { IDataContext, Query, Update } from './IDataContext';
 
-export interface Update<T> {
-  $set: Partial<T>;
-}
+export type { Query, Update } from './IDataContext';
 
-export class MongoContext<T extends { id: number }> {
+export class MongoContext<T extends { id: number }> implements IDataContext<T> {
   private readonly collection: T[];
 
   constructor(seed: T[] = []) {
@@ -45,6 +43,14 @@ export class MongoContext<T extends { id: number }> {
 
     this.collection.splice(index, 1);
     return true;
+  }
+
+  async count(): Promise<number> {
+    return this.collection.length;
+  }
+
+  async nextId(): Promise<number> {
+    return this.collection.reduce((max, item) => Math.max(max, item.id), 0) + 1;
   }
 
   private matches(item: T, query: Query<T>): boolean {
