@@ -1,5 +1,21 @@
 LOGICA DE EXTRACCION DE DATOS
 
-AQUI VENDRA LA INFORMACION DE MONGO DB
+AQUI VIENE LA INFORMACION DE MONGO DB
 
-SERA LA FASE FINAL
+context/
+  IDataContext.ts   -> contrato comun de las fuentes de datos (find, findOne, insertOne,
+                       updateOne, deleteOne, count, nextId)
+  MongoContext.ts   -> fuente MOCK: coleccion simulada en memoria
+  MongoDbContext.ts -> fuente REAL: coleccion de MongoDB (mongoose.connection.db)
+  Database.ts       -> conexion (connectDatabase) y fabrica createDataContext(source, coleccion, seed)
+  Seed.ts           -> datos semilla; se usan en memoria o para poblar colecciones vacias de MongoDB
+
+repositories/
+  Un repositorio por modelo del dominio. Dependen solo de IDataContext, por lo que cambiar
+  DATA_SOURCE (mongo | memory) no modifica la logica de negocio.
+
+Notas
+  - Se conserva el id numerico del dominio; el _id de MongoDB no sale de MongoDbContext.
+  - La eliminacion es logica: changeControl.eliminated = 1 y changeControl.active = 0.
+  - Las relaciones (computer.laboratory, reservation.user, reservation.computer, comment.user,
+    comment.computer) se guardan embebidas; los servicios refrescan equipo y laboratorio al leer.
