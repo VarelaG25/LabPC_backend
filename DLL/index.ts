@@ -4,3 +4,5 @@ export * from './context/MongoDbContext';
 export * from './context/Database';
 export * from './context/Seed';
 export * from './repositories/UserRepository';
+export * from './repositories/LaboratoryRepository';
+export * from './repositories/ComputerRepository';
