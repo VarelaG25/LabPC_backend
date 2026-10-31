@@ -13,3 +13,8 @@ export * from './results/Result';
 export * from './results/Messages';
 export * from './use-cases/GetUser.use-case';
 export * from './use-cases/Login.use-case';
+export * from './use-cases/GetLaboratories.use-case';
+export * from './use-cases/GetLaboratory.use-case';
+export * from './use-cases/CreateLaboratory.use-case';
+export * from './use-cases/UpdateLaboratory.use-case';
+export * from './use-cases/DeleteLaboratory.use-case';
