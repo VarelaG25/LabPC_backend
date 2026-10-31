@@ -10,5 +10,6 @@ export * from './interfaces/ILaboratoryRepository';
 export * from './interfaces/IComputerService';
 export * from './interfaces/IComputerRepository';
 export * from './results/Result';
+export * from './results/Messages';
 export * from './use-cases/GetUser.use-case';
 export * from './use-cases/Login.use-case';
