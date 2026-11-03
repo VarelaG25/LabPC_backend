@@ -18,3 +18,8 @@ export * from './use-cases/GetLaboratory.use-case';
 export * from './use-cases/CreateLaboratory.use-case';
 export * from './use-cases/UpdateLaboratory.use-case';
 export * from './use-cases/DeleteLaboratory.use-case';
+export * from './use-cases/GetComputers.use-case';
+export * from './use-cases/GetComputer.use-case';
+export * from './use-cases/CreateComputer.use-case';
+export * from './use-cases/UpdateComputer.use-case';
+export * from './use-cases/DeleteComputer.use-case';
