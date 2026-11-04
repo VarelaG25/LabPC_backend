@@ -1,0 +1,1 @@
+export { ILaboratoryService } from '../../Application';
