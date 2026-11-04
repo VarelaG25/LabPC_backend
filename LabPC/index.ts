@@ -2,12 +2,17 @@ import 'dotenv/config';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import cors from 'cors';
 import {
+  CreateComputerUseCase,
   CreateLaboratoryUseCase,
+  DeleteComputerUseCase,
   DeleteLaboratoryUseCase,
+  GetComputerUseCase,
+  GetComputersUseCase,
   GetLaboratoriesUseCase,
   GetLaboratoryUseCase,
   GetUserUseCase,
   LoginUseCase,
+  UpdateComputerUseCase,
   UpdateLaboratoryUseCase,
 } from '../Application';
 import {
@@ -23,10 +28,13 @@ import {
 } from '../DLL';
 import type { Computer, Laboratory, User } from '../Domain';
 import { AuthenticationService } from '../LabPC_BL/services/Authentication.service';
+import { ComputerService } from '../LabPC_BL/services/Computer.service';
 import { LaboratoryService } from '../LabPC_BL/services/Laboratory.service';
 import { AuthenticationController } from './controllers/Authentication.controller';
+import { ComputerController } from './controllers/Computer.controller';
 import { LaboratoryController } from './controllers/Laboratory.controller';
 import { createAuthenticationRoutes } from './routes/Authentication.routes';
+import { createComputerRoutes } from './routes/Computer.routes';
 import { createLaboratoryRoutes } from './routes/Laboratory.routes';
 
 const app = express();
@@ -56,6 +64,7 @@ async function bootstrap(): Promise<void> {
   // Servicios
   const authenticationService = new AuthenticationService(userRepository);
   const laboratoryService = new LaboratoryService(laboratoryRepository, computerRepository);
+  const computerService = new ComputerService(computerRepository, laboratoryRepository);
 
   // Controladores
   const authenticationController = new AuthenticationController(
@@ -69,11 +78,19 @@ async function bootstrap(): Promise<void> {
     new UpdateLaboratoryUseCase(laboratoryService),
     new DeleteLaboratoryUseCase(laboratoryService),
   );
+  const computerController = new ComputerController(
+    new GetComputersUseCase(computerService),
+    new GetComputerUseCase(computerService),
+    new CreateComputerUseCase(computerService),
+    new UpdateComputerUseCase(computerService),
+    new DeleteComputerUseCase(computerService),
+  );
 
   app.use(cors());
   app.use(express.json());
   app.use('/api/auth', createAuthenticationRoutes(authenticationController));
   app.use('/api/laboratories', createLaboratoryRoutes(laboratoryController));
+  app.use('/api/computers', createComputerRoutes(computerController));
 
   app.use((_request: Request, response: Response) => {
     response.status(404).json({ error: 'Ruta no encontrada.' });
