@@ -6,7 +6,7 @@ import type {
   UserDto,
 } from '../../Application';
 import { Result } from '../../Application';
-import { RespOp, type Contract, type User } from '../../Domain';
+import { Contract, RespOp, type User } from '../../Domain';
 
 export class AuthenticationService implements IAuthenticationService {
   constructor(private readonly userRepository: IUserRepository) {}
@@ -30,17 +30,17 @@ export class AuthenticationService implements IAuthenticationService {
     }
 
     const user = await this.userRepository.findById(userId);
+    if (!user) {
+      return Result.failure('Usuario no encontrado.');
+    }
 
-    const contract: Contract<UserDto> = {
-      RespOp: RespOp.Ok,
-      Object: { id: 1, name: 'admin', email: 'admin@labpc.local', role: 1 },
-      ObjectList: [],
-      ObjectId: 1,
-      Response: 'OK',
-      Total: 1,
-    };
-
-    return user ? Result.success(contract) : Result.failure('Usuario no encontrado.');
+    const contract = new Contract<UserDto>();
+    contract.RespOp = RespOp.Ok;
+    contract.Object = this.toDto(user);
+    contract.ObjectId = user.id;
+    contract.Response = 'OK';
+    contract.Total = 1;
+    return Result.success(contract);
   }
 
   private toDto(user: User): UserDto {
