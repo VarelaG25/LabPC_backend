@@ -1,14 +1,16 @@
 import type { Request, Response } from 'express';
-import type { GetUserUseCase, LoginUseCase } from '../../Application';
+import type { GetUserUseCase, LoginUseCase, RegisterUseCase } from '../../Application';
+import { statusCodeFor } from '../../Application';
 
 export class AuthenticationController {
   constructor(
     private readonly loginUseCase: LoginUseCase,
     private readonly getUserUseCase: GetUserUseCase,
+    private readonly registerUseCase: RegisterUseCase,
   ) {}
 
   async login(request: Request, response: Response): Promise<void> {
-    const result = await this.loginUseCase.execute(request.body);
+    const result = await this.loginUseCase.execute(request.body ?? {});
     if (!result.isSuccess) {
       response.status(401).json({ error: result.error });
       return;
@@ -28,5 +30,15 @@ export class AuthenticationController {
     }
 
     response.status(200).json(result.value);
+  }
+
+  async register(request: Request, response: Response): Promise<void> {
+    const result = await this.registerUseCase.execute(request.body ?? {});
+    if (!result.isSuccess) {
+      response.status(statusCodeFor(result.error)).json({ error: result.error });
+      return;
+    }
+
+    response.status(201).json(result.value);
   }
 }

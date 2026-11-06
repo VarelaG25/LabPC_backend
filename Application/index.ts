@@ -1,6 +1,7 @@
 export * from './dtos/LoginRequest.dto';
 export * from './dtos/LoginResponse.dto';
 export * from './dtos/User.dto';
+export * from './dtos/Register.dto';
 export * from './dtos/Laboratory.dto';
 export * from './dtos/Computer.dto';
 export * from './interfaces/IAuthenticationService';
@@ -13,6 +14,7 @@ export * from './results/Result';
 export * from './results/Messages';
 export * from './use-cases/GetUser.use-case';
 export * from './use-cases/Login.use-case';
+export * from './use-cases/Register.use-case';
 export * from './use-cases/GetLaboratories.use-case';
 export * from './use-cases/GetLaboratory.use-case';
 export * from './use-cases/CreateLaboratory.use-case';

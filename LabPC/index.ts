@@ -12,6 +12,7 @@ import {
   GetLaboratoryUseCase,
   GetUserUseCase,
   LoginUseCase,
+  RegisterUseCase,
   UpdateComputerUseCase,
   UpdateLaboratoryUseCase,
 } from '../Application';
@@ -70,6 +71,7 @@ async function bootstrap(): Promise<void> {
   const authenticationController = new AuthenticationController(
     new LoginUseCase(authenticationService),
     new GetUserUseCase(authenticationService),
+    new RegisterUseCase(authenticationService),
   );
   const laboratoryController = new LaboratoryController(
     new GetLaboratoriesUseCase(laboratoryService),
