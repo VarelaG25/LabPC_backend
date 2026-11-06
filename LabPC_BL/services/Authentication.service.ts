@@ -3,10 +3,12 @@ import type {
   IUserRepository,
   LoginRequestDto,
   LoginResponseDto,
+  RegisterRequestDto,
   UserDto,
 } from '../../Application';
-import { Result } from '../../Application';
-import { RespOp, type Contract, type User } from '../../Domain';
+import { Messages, Result } from '../../Application';
+import { User, UserRole, type Contract } from '../../Domain';
+import { isEnumValue, toObjectContract, toUserDto } from './Mappers';
 
 export class AuthenticationService implements IAuthenticationService {
   constructor(private readonly userRepository: IUserRepository) {}
@@ -26,29 +28,42 @@ export class AuthenticationService implements IAuthenticationService {
 
   async getUser(userId: number): Promise<Result<Contract<UserDto>>> {
     if (!Number.isInteger(userId) || userId <= 0) {
-      return Result.failure('El identificador de usuario no es válido.');
+      return Result.failure(Messages.UserIdInvalid);
     }
 
     const user = await this.userRepository.findById(userId);
+    return user
+      ? Result.success(toObjectContract(this.toDto(user), user.id, 'OK'))
+      : Result.failure(Messages.UserNotFound);
+  }
 
-    const contract: Contract<UserDto> = {
-      RespOp: RespOp.Ok,
-      Object: { id: 1, name: 'admin', email: 'admin@labpc.local', role: 1 },
-      ObjectList: [],
-      ObjectId: 1,
-      Response: 'OK',
-      Total: 1,
-    };
+  async register(request: RegisterRequestDto): Promise<Result<Contract<UserDto>>> {
+    if (!request?.name?.trim() || !request.email?.trim() || !request.password) {
+      return Result.failure(Messages.RequiredFields);
+    }
 
-    return user ? Result.success(contract) : Result.failure('Usuario no encontrado.');
+    const role = request.role ?? UserRole.Student;
+    if (!isEnumValue(UserRole, role)) {
+      return Result.failure('El rol no es válido.');
+    }
+
+    if (await this.userRepository.findByEmail(request.email)) {
+      return Result.failure(Messages.EmailDuplicated);
+    }
+
+    const user = await this.userRepository.create(
+      new User({
+        name: request.name.trim(),
+        email: request.email.trim().toLowerCase(),
+        password: request.password,
+        role,
+      }),
+    );
+
+    return Result.success(toObjectContract(this.toDto(user), user.id, 'Usuario registrado correctamente.'));
   }
 
   private toDto(user: User): UserDto {
-    return {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    };
+    return toUserDto(user);
   }
 }

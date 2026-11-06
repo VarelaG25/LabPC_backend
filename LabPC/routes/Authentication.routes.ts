@@ -4,6 +4,7 @@ import type { AuthenticationController } from '../controllers/Authentication.con
 export function createAuthenticationRoutes(controller: AuthenticationController): Router {
   const router = Router();
   router.post('/login', (request, response) => controller.login(request, response));
+  router.post('/register', (request, response) => controller.register(request, response));
   router.get('/users/:userId', (request, response) => controller.getUser(request, response));
   return router;
 }
