@@ -28,3 +28,7 @@ export * from './use-cases/GetComputer.use-case';
 export * from './use-cases/CreateComputer.use-case';
 export * from './use-cases/UpdateComputer.use-case';
 export * from './use-cases/DeleteComputer.use-case';
+export * from './use-cases/GetUserReservations.use-case';
+export * from './use-cases/GetReservation.use-case';
+export * from './use-cases/CreateReservation.use-case';
+export * from './use-cases/CancelReservation.use-case';
