@@ -148,11 +148,21 @@ export class ReservationService implements IReservationService {
     );
   }
 
-  /** Agrega los datos actuales del equipo. */
+  /** Agrega los datos actuales del equipo y ajusta el estado según la hora (en curso o terminada). */
   private async toDto(reservation: Reservation): Promise<ReservationDto> {
     const computer = reservation.computer
       ? await this.computerRepository.findById(reservation.computer.id)
       : null;
-    return toReservationDto(reservation, computer);
+    const dto = toReservationDto(reservation, computer);
+
+    if (BLOCKING_STATUSES.includes(dto.status)) {
+      const now = Date.now();
+      if (Date.parse(dto.end_time ?? '') <= now) {
+        dto.status = Status.Completed;
+      } else if (Date.parse(dto.start_time ?? '') <= now) {
+        dto.status = Status.Active;
+      }
+    }
+    return dto;
   }
 }
