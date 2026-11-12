@@ -1,6 +1,7 @@
 import type {
   ComputerDto,
   LaboratoryDto,
+  ReservationDto,
   UserDto,
 } from '../../Application';
 import {
@@ -8,6 +9,7 @@ import {
   RespOp,
   type Computer,
   type Laboratory,
+  type Reservation,
   type User,
 } from '../../Domain';
 
@@ -40,6 +42,26 @@ export function toComputerDto(computer: Computer, laboratory?: Laboratory | null
     laboratoryId: currentLaboratory?.id ?? null,
     laboratory: currentLaboratory ? toLaboratoryDto(currentLaboratory) : null,
     created_date: computer.changeControl?.created_date ?? null,
+  };
+}
+
+export function toReservationDto(reservation: Reservation, computer?: Computer | null): ReservationDto {
+  const currentComputer = computer ?? reservation.computer ?? null;
+  const start = reservation.start_time ? Date.parse(reservation.start_time) : NaN;
+  const end = reservation.end_time ? Date.parse(reservation.end_time) : NaN;
+  return {
+    id: reservation.id,
+    code: reservation.code ?? null,
+    topic: reservation.topic ?? null,
+    description: reservation.description ?? null,
+    start_time: reservation.start_time,
+    end_time: reservation.end_time,
+    durationMinutes: Number.isNaN(start) || Number.isNaN(end) ? 0 : Math.round((end - start) / 60000),
+    status: reservation.status,
+    userId: reservation.user?.id ?? null,
+    computerId: currentComputer?.id ?? null,
+    computer: currentComputer ? toComputerDto(currentComputer) : null,
+    created_date: reservation.changeControl?.created_date ?? null,
   };
 }
 

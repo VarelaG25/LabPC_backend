@@ -6,3 +6,4 @@ export * from './context/Seed';
 export * from './repositories/UserRepository';
 export * from './repositories/LaboratoryRepository';
 export * from './repositories/ComputerRepository';
+export * from './repositories/ReservationRepository';
