@@ -7,3 +7,4 @@ export * from './repositories/UserRepository';
 export * from './repositories/LaboratoryRepository';
 export * from './repositories/ComputerRepository';
 export * from './repositories/ReservationRepository';
+export * from './repositories/CommentRepository';
