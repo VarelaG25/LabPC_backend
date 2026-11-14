@@ -35,3 +35,6 @@ export * from './use-cases/GetUserReservations.use-case';
 export * from './use-cases/GetReservation.use-case';
 export * from './use-cases/CreateReservation.use-case';
 export * from './use-cases/CancelReservation.use-case';
+export * from './use-cases/GetIncidents.use-case';
+export * from './use-cases/CreateIncident.use-case';
+export * from './use-cases/UpdateIncidentStatus.use-case';

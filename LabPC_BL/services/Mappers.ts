@@ -1,12 +1,16 @@
 import type {
   ComputerDto,
+  IncidentDto,
   LaboratoryDto,
   ReservationDto,
   UserDto,
 } from '../../Application';
 import {
   Contract,
+  IncidentStatus,
   RespOp,
+  TypeMessage,
+  type Comment,
   type Computer,
   type Laboratory,
   type Reservation,
@@ -62,6 +66,20 @@ export function toReservationDto(reservation: Reservation, computer?: Computer |
     computerId: currentComputer?.id ?? null,
     computer: currentComputer ? toComputerDto(currentComputer) : null,
     created_date: reservation.changeControl?.created_date ?? null,
+  };
+}
+
+export function toIncidentDto(comment: Comment): IncidentDto {
+  return {
+    id: comment.id,
+    message: comment.message,
+    type: comment.type ?? TypeMessage.Issue,
+    status: comment.status ?? IncidentStatus.Open,
+    userId: comment.user?.id ?? null,
+    userName: comment.user?.name ?? null,
+    computerId: comment.computer?.id ?? null,
+    computerCode: comment.computer?.code ?? null,
+    created_date: comment.changeControl?.created_date ?? null,
   };
 }
 
