@@ -9,8 +9,9 @@ import {
   CreateReservationUseCase,
   DeleteComputerUseCase,
   DeleteLaboratoryUseCase,
-  GetComputerUseCase,
   GetComputersUseCase,
+  GetDashboardStatsUseCase,
+  GetComputerUseCase,
   GetIncidentsUseCase,
   GetLaboratoriesUseCase,
   GetLaboratoryUseCase,
@@ -39,16 +40,19 @@ import {
   type DataSource,
 } from '../DLL';
 import type { Comment, Computer, Laboratory, Reservation, User } from '../Domain';
+import { AdminService } from '../LabPC_BL/services/Admin.service';
 import { AuthenticationService } from '../LabPC_BL/services/Authentication.service';
 import { ComputerService } from '../LabPC_BL/services/Computer.service';
 import { IncidentService } from '../LabPC_BL/services/Incident.service';
 import { LaboratoryService } from '../LabPC_BL/services/Laboratory.service';
 import { ReservationService } from '../LabPC_BL/services/Reservation.service';
+import { AdminController } from './controllers/Admin.controller';
 import { AuthenticationController } from './controllers/Authentication.controller';
 import { ComputerController } from './controllers/Computer.controller';
 import { IncidentController } from './controllers/Incident.controller';
 import { LaboratoryController } from './controllers/Laboratory.controller';
 import { ReservationController } from './controllers/Reservation.controller';
+import { createAdminRoutes } from './routes/Admin.routes';
 import { createAuthenticationRoutes } from './routes/Authentication.routes';
 import { createComputerRoutes } from './routes/Computer.routes';
 import { createIncidentRoutes } from './routes/Incident.routes';
@@ -71,9 +75,17 @@ async function bootstrap(): Promise<void> {
 
   // Fuentes de datos (en memoria o MongoDB, según DATA_SOURCE)
   const userContext = await createDataContext<User>(dataSource, 'users', usersSeed);
-  const laboratoryContext = await createDataContext<Laboratory>(dataSource, 'laboratories', laboratoriesSeed);
+  const laboratoryContext = await createDataContext<Laboratory>(
+    dataSource,
+    'laboratories',
+    laboratoriesSeed,
+  );
   const computerContext = await createDataContext<Computer>(dataSource, 'computers', computersSeed);
-  const reservationContext = await createDataContext<Reservation>(dataSource, 'reservations', reservationsSeed);
+  const reservationContext = await createDataContext<Reservation>(
+    dataSource,
+    'reservations',
+    reservationsSeed,
+  );
   const commentContext = await createDataContext<Comment>(dataSource, 'comments', commentsSeed);
 
   // Repositorios
@@ -87,8 +99,18 @@ async function bootstrap(): Promise<void> {
   const authenticationService = new AuthenticationService(userRepository);
   const laboratoryService = new LaboratoryService(laboratoryRepository, computerRepository);
   const computerService = new ComputerService(computerRepository, laboratoryRepository);
-  const reservationService = new ReservationService(reservationRepository, computerRepository, userRepository);
+  const reservationService = new ReservationService(
+    reservationRepository,
+    computerRepository,
+    userRepository,
+  );
   const incidentService = new IncidentService(commentRepository, computerRepository, userRepository);
+  const adminService = new AdminService(
+    userRepository,
+    computerRepository,
+    reservationRepository,
+    commentRepository,
+  );
 
   // Controladores
   const authenticationController = new AuthenticationController(
@@ -121,6 +143,7 @@ async function bootstrap(): Promise<void> {
     new CreateIncidentUseCase(incidentService),
     new UpdateIncidentStatusUseCase(incidentService),
   );
+  const adminController = new AdminController(new GetDashboardStatsUseCase(adminService));
 
   app.use(cors());
   app.use(express.json());
@@ -129,6 +152,7 @@ async function bootstrap(): Promise<void> {
   app.use('/api/computers', createComputerRoutes(computerController));
   app.use('/api/reservations', createReservationRoutes(reservationController));
   app.use('/api/incidents', createIncidentRoutes(incidentController));
+  app.use('/api/admin', createAdminRoutes(adminController));
 
   app.use((_request: Request, response: Response) => {
     response.status(404).json({ error: 'Ruta no encontrada.' });
