@@ -117,6 +117,18 @@ response.Response = 'Usuario consultado correctamente';
   entre capas.
 - [`TypeMessage`](./enums/TypeMessage.enum.ts): clasifica los comentarios como
   `General` o `Issue`.
+- [`ComputerStatus`](./enums/ComputerStatus.enum.ts): estado de un equipo
+  (`Available`, `Reserved`, `InUse`, `Maintenance`).
+- [`IncidentStatus`](./enums/IncidentStatus.enum.ts): estado de un `Comment` de
+  tipo `Issue` (`Open`, `InProgress`, `Resolved`).
+
+### Campos agregados (2026-11-18)
+
+- `Laboratory`: `location`, `capacity`.
+- `Computer`: `specs` (texto `"a / b / c"`), `status: ComputerStatus`.
+- `Reservation`: `code` (`RES-AAAA-NNNNN`), `topic`, `description`.
+- `Comment`: `status?: IncidentStatus` (una incidencia es un `Comment` con
+  `type: TypeMessage.Issue`).
 
 ## Constructores y creación de objetos
 

@@ -16,7 +16,7 @@ mongoose
   .then(() => console.log("Conectado exitosamente a MongoDB"))
   .catch((error) => console.error("Error al conectar a MongoDB:", error));
 
-// Rutas (las definiremos a continuación)
+// Rutas
 app.use("/api/auth", require("./routes/UserRoutes"));
 
 // Iniciar servidor
